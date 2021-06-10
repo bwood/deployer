@@ -13,7 +13,7 @@ RUN apt-get -y update && \
 # Setup Deployer
 ADD / /deployer/
 WORKDIR /deployer
-# TODO: Take desired version as build arg. Checkout the tag. Sed the version number to correct so --version works.
+# Take desired version as build arg. Sed the version number to correct so --version works.
 RUN sed -i -E "s/__version__ = '0.0.0'/__version__ = '${VER}'/" deployer/__init__.py
 RUN python setup.py sdist
 RUN pip install dist/deployer-*.tar.gz
