@@ -1,33 +1,32 @@
-FROM centos/python-36-centos7
+# See docker build instructions in README.md.
 
+# Update version tag to match the python version supported in setup.py in the deployer release
+FROM python:3.8-buster
+ARG VER
 USER root
 
 # Perform updates
 RUN pip install --upgrade pip
-RUN yum update -y
+RUN apt-get -y update && \
+  apt-get install sed
 
 # Setup Deployer
-ADD / /deployer
+ADD / /deployer/
 WORKDIR /deployer
+# Take desired version as build arg. Sed the version number to correct so --version works.
+RUN sed -i -E "s/__version__ = '0.0.0'/__version__ = '${VER}'/" deployer/__init__.py
 RUN python setup.py sdist
 RUN pip install dist/deployer-*.tar.gz
-
-# Install node
-RUN curl -sL https://rpm.nodesource.com/setup_10.x | bash -
-RUN yum install nodejs -y
 
 # Prep workspace
 RUN mkdir /workspace
 WORKDIR /workspace
 VOLUME /workspace
-RUN mkdir ~/.npm
 
-# Permissions
-RUN useradd -d /deployerUser deployerUser
-RUN chown -R deployerUser:deployerUser ~/.npm
+# User
+RUN mkdir /deployerUser && useradd -d /deployerUser deployerUser
 RUN chown -R deployerUser:deployerUser /workspace
-RUN chmod -R 757 ~/.npm
 
-CMD /opt/app-root/bin/deployer
+CMD /usr/local/bin/deployer
 
 USER deployerUser
