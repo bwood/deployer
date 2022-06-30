@@ -22,7 +22,7 @@ git branch -D $ver
 This function allows you to run `deployer -c config/us-east...`
 ``` 
 deployer () {
-  docker run --rm --init -it -v $PWD:/workspace -v $HOME/.aws:/deployerUser/.aws deployer:0.4.4 deployer "$@"
+  docker run --rm --init -it -v $PWD:/workspace -v $HOME/.aws:/deployerUser/.aws -v $HOME/.cache:/deployerUser/.cache deployer:$DEPLOYER_VER deployer "$@"
 }
 ```
 
